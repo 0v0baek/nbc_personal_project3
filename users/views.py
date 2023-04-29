@@ -27,7 +27,8 @@ class UserProfileView(APIView):
     # 유저 프로필 수정
     def put(self, request, user_id):
         user = get_object_or_404(User, id=user_id)
-        # 프로필 유저와 현재 유저가 일치하는지 확인 (headers에 Authorization, token 실어주기)
+        # 프로필 유저와 현재 유저가 일치하는지 확인
+        # headers에 Authorization, token 실어주기
         if request.user.id == user_id:
             serializer = UserEditSerializer(user, data=request.data)
             if serializer.is_valid():
@@ -38,7 +39,8 @@ class UserProfileView(APIView):
 
     def delete(self, request, user_id):
         user = get_object_or_404(User, id=user_id)
-        # 프로필 유저와 현재 유저가 일치하는지 확인 (headers에 Authorization, token 실어주기)
+        # 프로필 유저와 현재 유저가 일치하는지 확인
+        # headers에 Authorization, token 실어주기
         if request.user.id == user_id:
             user.delete()
             return Response(status=status.HTTP_204_NO_CONTENT)

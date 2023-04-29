@@ -8,13 +8,17 @@ from django.db.models import Q
 from .models import Todo
 from .serializers import TodoListSerializer, TodoCreateSerializer, TodoSerializer
 
-# Todo 목록 (내 Todo만 보임)
+# headers에 Authorization, token 실어주기
+
+# Todo 메인 화면
 class TodoView(APIView):
+    # 내가 쓴 글 목록만 가져오기
     def get(self, request):
         todos = Todo.objects.filter(user_id=request.user.id)
         serializer = TodoListSerializer(todos, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
     
+    # 글 작성하기 (로그인 되어있어야 가능)
     def post(self, request):
         serializer = TodoCreateSerializer(data=request.data)
         if serializer.is_valid():
@@ -25,11 +29,16 @@ class TodoView(APIView):
 
 # Todo detail
 class TodoDetailView(APIView):
+    # 특정 todo 상세 목록 보기
     def get(self, request, todo_id):
-        todo = get_object_or_404(Todo, id=todo_id)
-        serializer = TodoSerializer(todo)
-        return Response(serializer.data, status=status.HTTP_200_OK)
-
+        if request.user == todo.user:
+            todo = get_object_or_404(Todo, id=todo_id)
+            serializer = TodoSerializer(todo)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        else:
+            return Response("내가 작성한 글이 아닙니다.", status=status.HTTP_403_FORBIDDEN)
+    
+    # todo 수정
     def put(self, request, todo_id):
         todo = get_object_or_404(Todo, id=todo_id)
         # 로그인 한 유저와 todo 작성 유저가 일치하는 지
@@ -47,9 +56,10 @@ class TodoDetailView(APIView):
             else:
                 return Response("권한이 없습니다!!!", status=status.HTTP_403_FORBIDDEN)
 
-
+    # todo 삭제
     def delete(self, request, todo_id):
         todo = get_object_or_404(Todo, id=todo_id)
+        # 로그인 한 유저와 todo 작성 유저가 일치하는 지
         if request.user == todo.user:
             todo.delete()
             return Response("삭제 완료!", status=status.HTTP_204_NO_CONTENT)

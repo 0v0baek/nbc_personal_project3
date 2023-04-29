@@ -41,7 +41,6 @@ class User(AbstractBaseUser):
     username = models.CharField(max_length=50, default="기본 사용자")
     age = models.PositiveIntegerField(default=0)
     introduction = models.CharField(max_length=256, default="잘 부탁드립니다.")
-    is_active = models.BooleanField(default=True)
     is_admin = models.BooleanField(default=False)
 
     objects = UserManager()
