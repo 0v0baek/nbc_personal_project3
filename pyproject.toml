@@ -1,0 +1,18 @@
+[tool.poetry]
+name = "drf-todo-poetry"
+version = "0.0.0"
+description = "nbc personal project todo poetry"
+authors = ["0v0baek <qorqor4592@gmail.com>"]
+readme = "README.md"
+packages = [{include = "drf_todo_poetry"}]
+
+[tool.poetry.dependencies]
+python = "^3.11"
+django = "^4.2"
+djangorestframework = "^3.14.0"
+djangorestframework-simplejwt = "^5.2.2"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
