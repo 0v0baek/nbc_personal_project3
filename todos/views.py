@@ -22,7 +22,7 @@ class TodoView(APIView):
     def post(self, request):
         serializer = TodoCreateSerializer(data=request.data)
         if serializer.is_valid():
-            serializer.save(user=request.user)
+            serializer.save(user=request.user, created_at = timezone.now())
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -31,6 +31,7 @@ class TodoView(APIView):
 class TodoDetailView(APIView):
     # 특정 todo 상세 목록 보기
     def get(self, request, todo_id):
+        todo = get_object_or_404(Todo, id=todo_id)
         if request.user == todo.user:
             todo = get_object_or_404(Todo, id=todo_id)
             serializer = TodoSerializer(todo)
@@ -47,11 +48,10 @@ class TodoDetailView(APIView):
             if serializer.is_valid():
                 # todo를 완수하지 않았을 때
                 if todo.is_complete == False:
-                    serializer.save(completion_at = '')
+                    serializer.save(completion_at = '', updated_at = timezone.now())
                 # todo를 완수했을 때
                 else:
-                    print(timezone.now())
-                    serializer.save(completion_at = timezone.now())
+                    serializer.save(completion_at = timezone.now(), updated_at = '')
                 return Response(serializer.data, status=status.HTTP_200_OK)
             else:
                 return Response("권한이 없습니다!!!", status=status.HTTP_403_FORBIDDEN)
